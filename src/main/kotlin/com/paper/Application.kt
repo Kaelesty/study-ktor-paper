@@ -1,6 +1,9 @@
 package com.paper
 
-import com.paper.plugins.*
+import com.paper.features.auth.InMemoryAuthRepository
+import com.paper.features.auth.configureAuth
+import com.paper.plugins.configureRouting
+import com.paper.plugins.configureSerialization
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
@@ -13,4 +16,8 @@ fun main() {
 fun Application.module() {
     configureSerialization()
     configureRouting()
+    configureAuth(
+        path = "auth",
+        repository = InMemoryAuthRepository()
+    )
 }
