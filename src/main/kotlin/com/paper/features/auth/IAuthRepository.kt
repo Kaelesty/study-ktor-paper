@@ -8,9 +8,9 @@ interface IAuthRepository {
         val password: String
     )
 
-    fun registerUser(user: RegisterRequest): String?
+    suspend fun registerUser(user: RegisterRequest): String?
 
-    fun loginUser(user: LoginRequest): String?
+    suspend fun loginUser(user: LoginRequest): String?
 
-    fun getUserByToken(token: String): User?
+    suspend fun getUserByToken(token: String): User?
 }

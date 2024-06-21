@@ -11,12 +11,12 @@ class InMemoryAuthRepository: IAuthRepository {
     private val users: MutableList<IAuthRepository.User> = mutableListOf()
     private val tokens: MutableList<UserToken> = mutableListOf()
 
-    override fun getUserByToken(token: String): IAuthRepository.User? {
+    override suspend fun getUserByToken(token: String): IAuthRepository.User? {
         val login = tokens.find { it.token == token }?.login ?: return null
         return users.find { it.login == login }
     }
 
-    override fun registerUser(user: RegisterRequest): String? {
+    override suspend fun registerUser(user: RegisterRequest): String? {
         if (users.map { it.login }.contains(user.login)) {
             return null
         }
@@ -24,7 +24,7 @@ class InMemoryAuthRepository: IAuthRepository {
         return createAndSaveToken(user.login)
     }
 
-    override fun loginUser(user: LoginRequest): String? {
+    override suspend fun loginUser(user: LoginRequest): String? {
         if (users.find { it.login == user.login }?.password == user.password) {
             return createAndSaveToken(user.login)
         }
