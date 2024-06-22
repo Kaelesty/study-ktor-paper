@@ -8,47 +8,53 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
-data class ExposedUser(val name: String, val age: Int)
+data class User(
+    val name: String,
+    val login: String,
+    val password: String,
+)
+
 class UserService(database: Database) {
     object Users : Table() {
         val id = integer("id").autoIncrement()
-        val name = varchar("name", length = 50)
-        val age = integer("age")
+        val name = varchar("name", length = 25)
+        val login = varchar("login", length = 25)
+        val password = varchar("password", length = 25)
 
         override val primaryKey = PrimaryKey(id)
     }
 
     init {
         transaction(database) {
-            SchemaUtils.create(Users)
+            SchemaUtils.createMissingTablesAndColumns(Users)
         }
     }
 
     suspend fun <T> dbQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    suspend fun create(user: ExposedUser): Int = dbQuery {
+    suspend fun create(user: User): Int = dbQuery {
         Users.insert {
             it[name] = user.name
-            it[age] = user.age
+            it[password] = user.password
+            it[login] = user.login
         }[Users.id]
     }
 
-    suspend fun read(id: Int): ExposedUser? {
+    suspend fun getId(login: String): Int? = dbQuery {
+        Users
+            .selectAll()
+            .where( Users.login eq login)
+            .map { it[Users.id] }
+            .singleOrNull()
+    }
+
+    suspend fun read(id: Int): User? {
         return dbQuery {
             Users.selectAll()
                 .where { Users.id eq id }
-                .map { ExposedUser(it[Users.name], it[Users.age]) }
+                .map { User(it[Users.name], it[Users.login], it[Users.password]) }
                 .singleOrNull()
-        }
-    }
-
-    suspend fun update(id: Int, user: ExposedUser) {
-        dbQuery {
-            Users.update({ Users.id eq id }) {
-                it[name] = user.name
-                it[age] = user.age
-            }
         }
     }
 

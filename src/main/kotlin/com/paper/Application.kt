@@ -1,6 +1,6 @@
 package com.paper
 
-import com.paper.database.configureDatabases
+import com.paper.features.auth.AuthRepository
 import com.paper.features.auth.InMemoryAuthRepository
 import com.paper.features.auth.configureAuth
 import com.paper.features.welcome.configureWelcome
@@ -19,7 +19,6 @@ fun Application.module() {
     configureWelcome()
     configureAuth(
         path = "auth",
-        repository = InMemoryAuthRepository()
+        repository = AuthRepository()
     )
-    configureDatabases()
 }
