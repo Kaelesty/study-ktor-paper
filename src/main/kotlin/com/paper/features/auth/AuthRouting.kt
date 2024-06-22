@@ -2,6 +2,8 @@ package com.paper.features.auth
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -46,17 +48,12 @@ fun Application.configureAuth(
             }
         }
 
-        get("$path/getUser") {
-            val token = call.receive<GetUserRequest>().token
-            val user = repository.getUserByToken(token)
-            if (user == null) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid token")
-            }
-            else {
-                call.respond(GetUserResponse(
-                    name = user.name,
-                    login = user.login
-                ))
+        authenticate("auth-jwt") {
+            get("$path/getUser") {
+                val principal = call.principal<JWTPrincipal>()
+                val username = principal!!.payload.getClaim("userId").asInt().toString()
+                val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
+                call.respondText("Hello, $username! Token is expired at $expiresAt ms.")
             }
         }
     }

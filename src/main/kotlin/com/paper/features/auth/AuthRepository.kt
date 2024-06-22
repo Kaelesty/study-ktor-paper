@@ -1,11 +1,24 @@
 package com.paper.features.auth
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.paper.database.User
 import com.paper.database.UserService
 import org.jetbrains.exposed.sql.Database
-import java.util.UUID
+import java.util.*
+import javax.management.monitor.StringMonitor
 
-class AuthRepository : IAuthRepository {
+data class JwtEnvironment(
+    val secret: String,
+    val issuer: String,
+    val audience: String,
+    val realm: String,
+    val tokenLifetimeMillis: Int
+)
+
+class AuthRepository(
+    private val jwtEnvironment: JwtEnvironment
+) : IAuthRepository {
 
     private val database = Database.connect(
         url = "jdbc:postgresql://localhost:5432/",
@@ -42,7 +55,14 @@ class AuthRepository : IAuthRepository {
         TODO()
     }
 
-    private suspend fun createNewToken(userId: Int): String {
-        return UUID.randomUUID().toString()
+    private fun createNewToken(userId: Int): String {
+        return JWT.create()
+            .withAudience(jwtEnvironment.audience)
+            .withIssuer(jwtEnvironment.issuer)
+            .withClaim("userId", userId)
+            .withExpiresAt(
+                Date(System.currentTimeMillis() + jwtEnvironment.tokenLifetimeMillis)
+            )
+            .sign(Algorithm.HMAC256(jwtEnvironment.secret))
     }
 }
