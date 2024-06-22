@@ -1,4 +1,4 @@
-package com.paper.features.welcome
+package com.paper.presentation.features.welcome
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*

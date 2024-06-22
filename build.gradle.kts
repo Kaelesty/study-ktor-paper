@@ -8,6 +8,7 @@ plugins {
     kotlin("jvm") version "2.0.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
     id("io.ktor.plugin") version "2.3.11"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.22"
 }
 
 group = "com.paper"
@@ -43,4 +44,7 @@ dependencies {
 
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+
+    implementation("com.google.dagger:dagger:2.51.1")
+    ksp("com.google.dagger:dagger-compiler:2.51.1")
 }

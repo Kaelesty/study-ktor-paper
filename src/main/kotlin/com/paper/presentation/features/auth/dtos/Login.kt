@@ -1,4 +1,4 @@
-package com.paper.features.auth
+package com.paper.presentation.features.auth.dtos
 
 import kotlinx.serialization.Serializable
 

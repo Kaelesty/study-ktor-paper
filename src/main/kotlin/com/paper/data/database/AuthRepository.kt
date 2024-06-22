@@ -1,12 +1,13 @@
-package com.paper.features.auth
+package com.paper.data.database
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.paper.database.User
-import com.paper.database.UserService
-import org.jetbrains.exposed.sql.Database
+import com.paper.domain.entities.User
+import com.paper.domain.repos.IAuthRepository
+import com.paper.presentation.features.auth.dtos.LoginRequest
+import com.paper.presentation.features.auth.dtos.RegisterRequest
 import java.util.*
-import javax.management.monitor.StringMonitor
+import javax.inject.Inject
 
 data class JwtEnvironment(
     val secret: String,
@@ -16,22 +17,18 @@ data class JwtEnvironment(
     val tokenLifetimeMillis: Int
 )
 
-class AuthRepository(
+class AuthRepository @Inject constructor(
+    private val userService: UserService,
     private val jwtEnvironment: JwtEnvironment
 ) : IAuthRepository {
 
-    private val database = Database.connect(
-        url = "jdbc:postgresql://localhost:5432/",
-        user = "postgres",
-        driver = "org.postgresql.Driver",
-        password = "188348"
-    )
-
-    private val userService = UserService(database)
-
-    override suspend fun registerUser(user: RegisterRequest): String {
+    override suspend fun registerUser(user: User): String? {
+        userService.getId(user.login)?.let {
+            return null
+        }
         val id = userService.create(
             User(
+                id = 0,
                 name = user.name,
                 login = user.login,
                 password = user.password,
@@ -42,17 +39,17 @@ class AuthRepository(
 
 
 
-    override suspend fun loginUser(user: LoginRequest): String? {
-        userService.getId(user.login)?.let { id ->
-            if (userService.read(id)?.password == user.password) {
+    override suspend fun loginUser(login: String, password: String): String? {
+        userService.getId(login)?.let { id ->
+            if (userService.read(id)?.password == password) {
                 return createNewToken(id)
             }
         }
         return null
     }
 
-    override suspend fun getUserByToken(token: String): IAuthRepository.User? {
-        TODO()
+    override suspend fun getNameById(id: Int): String? {
+        return userService.read(id)?.name
     }
 
     private fun createNewToken(userId: Int): String {

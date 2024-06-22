@@ -1,5 +1,10 @@
-package com.paper.features.auth
+package com.paper.presentation.features.auth
 
+import com.paper.domain.repos.IAuthRepository
+import com.paper.presentation.features.auth.dtos.LoginRequest
+import com.paper.presentation.features.auth.dtos.LoginResponse
+import com.paper.presentation.features.auth.dtos.RegisterRequest
+import com.paper.presentation.features.auth.dtos.RegisterResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -13,9 +18,9 @@ fun Application.configureAuth(
     repository: IAuthRepository
 ) {
     routing {
-        get("$path/register") {
+        post("$path/register") {
             val req = call.receive(RegisterRequest::class)
-            val token = repository.registerUser(req)
+            val token = repository.registerUser(req.toUser())
             if (token != null) {
                 call.respond(
                     RegisterResponse(
@@ -30,9 +35,9 @@ fun Application.configureAuth(
                 )
             }
         }
-        get("$path/login") {
+        post("$path/login") {
             val req = call.receive(LoginRequest::class)
-            val token = repository.loginUser(req)
+            val token = repository.loginUser(req.login, req.password)
             if (token != null) {
                 call.respond(
                     LoginResponse(
@@ -50,10 +55,13 @@ fun Application.configureAuth(
 
         authenticate("auth-jwt") {
             get("$path/getUser") {
-                val principal = call.principal<JWTPrincipal>()
-                val username = principal!!.payload.getClaim("userId").asInt().toString()
-                val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
-                call.respondText("Hello, $username! Token is expired at $expiresAt ms.")
+                call.principal<JWTPrincipal>()?.let { principal ->
+                    val username = principal.payload.getClaim("userId").asInt().toString()
+                    val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
+                    call.respondText("Hello, $username! Token is expired at $expiresAt ms.")
+                    return@get
+                }
+                call.respond(HttpStatusCode.Unauthorized, "JWT is invalid")
             }
         }
     }

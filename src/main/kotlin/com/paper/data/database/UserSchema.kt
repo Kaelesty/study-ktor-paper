@@ -1,20 +1,14 @@
-package com.paper.database
+package com.paper.data.database
 
+import com.paper.domain.entities.User
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import javax.inject.Inject
 
-@Serializable
-data class User(
-    val name: String,
-    val login: String,
-    val password: String,
-)
-
-class UserService(database: Database) {
+class UserService @Inject constructor(database: Database) {
     object Users : Table() {
         val id = integer("id").autoIncrement()
         val name = varchar("name", length = 25)
@@ -53,14 +47,9 @@ class UserService(database: Database) {
         return dbQuery {
             Users.selectAll()
                 .where { Users.id eq id }
-                .map { User(it[Users.name], it[Users.login], it[Users.password]) }
+                .map { User(it[Users.id], it[Users.name], it[Users.login], it[Users.password]) }
                 .singleOrNull()
         }
     }
 
-    suspend fun delete(id: Int) {
-        dbQuery {
-            Users.deleteWhere { Users.id.eq(id) }
-        }
-    }
 }

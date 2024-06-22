@@ -1,4 +1,4 @@
-package com.paper.plugins
+package com.paper.presentation.plugins
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm

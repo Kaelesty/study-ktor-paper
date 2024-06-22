@@ -1,4 +1,4 @@
-package com.paper.plugins
+package com.paper.presentation.plugins
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
