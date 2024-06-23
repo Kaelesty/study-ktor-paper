@@ -1,8 +1,13 @@
 package com.paper.presentation.features.posts.dtos
 
 import com.paper.domain.entities.Post
-import com.paper.domain.entities.User
 import kotlinx.serialization.Serializable
+
+@Serializable
+data class GetPostsRequest(
+    val limit: Int,
+    val page: Int
+)
 
 @Serializable
 data class GetPostsResponse(
@@ -17,12 +22,13 @@ data class PostResponse(
     val desc: String,
     val text: String,
     val createdTimeMillis: Long,
-    val likesCount: Int
+    val likesCount: Int,
+    val isLiked: Boolean
 ) {
     companion object {
 
         fun fromPost(post: Post, authorName: String) = with(post) {
-            PostResponse(id, title, authorName, desc, text, createdTimeMillis, likesCount)
+            PostResponse(id, title, authorName, desc, text, createdTimeMillis, likesCount, isLiked)
         }
     }
 }

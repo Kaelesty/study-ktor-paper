@@ -4,17 +4,17 @@ import com.paper.domain.entities.Comment
 
 interface ICommentsRepository {
 
-    fun leaveComment(
+    suspend fun leaveComment(
         postId: Int,
         creatorId: Int,
         text: String
     )
 
-    fun getPostComments(
+    suspend fun getPostComments(
         postId: Int
     ): List<Comment>
 
-    fun deleteComment(
+    suspend fun deleteComment(
         commentId: Int
     )
 }

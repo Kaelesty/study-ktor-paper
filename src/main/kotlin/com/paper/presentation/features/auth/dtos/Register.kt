@@ -10,7 +10,7 @@ data class RegisterRequest(
     val password: String
 ) {
     fun toUser() = User(
-        name, login, password
+        -1, name, login, password
     )
 }
 

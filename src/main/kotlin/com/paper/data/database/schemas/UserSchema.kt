@@ -1,4 +1,4 @@
-package com.paper.data.database
+package com.paper.data.database.schemas
 
 import com.paper.domain.entities.User
 import kotlinx.coroutines.Dispatchers

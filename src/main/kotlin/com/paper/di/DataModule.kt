@@ -1,7 +1,7 @@
 package com.paper.di
 
 import com.paper.Config
-import com.paper.data.database.JwtEnvironment
+import com.paper.data.database.repoimpls.JwtEnvironment
 import dagger.Module
 import dagger.Provides
 import org.jetbrains.exposed.sql.Database

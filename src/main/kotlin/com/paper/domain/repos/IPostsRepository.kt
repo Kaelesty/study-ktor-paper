@@ -4,16 +4,18 @@ import com.paper.domain.entities.Post
 
 interface IPostsRepository {
 
-    fun createPost(
+    suspend fun createPost(
         creatorId: Int,
         text: String,
         title: String,
         desc: String,
     )
 
-    fun getPosts(): List<Post>
+    suspend fun getPosts(limit: Int, page: Int, userId: Int): List<Post>
 
-    fun deletePost(postId: Int)
+    suspend fun deletePost(postId: Int)
 
-    fun likePost(postId: Int): Int // new count of likes
+    suspend fun likePost(userId: Int, postId: Int): Int // new count of likes
+
+    suspend fun dislikePost(userId: Int, postId: Int): Int
 }

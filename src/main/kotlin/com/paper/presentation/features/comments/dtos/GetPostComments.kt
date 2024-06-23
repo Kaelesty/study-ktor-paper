@@ -18,12 +18,16 @@ data class CommentResponse(
     val id: Int,
     val authorName: String,
     val text: String,
-    val createdTimeMillis: String
+    val createdTimeMillis: Long,
+    val isAuthored: Boolean
 ) {
 
     companion object {
-        fun fromComment(comment: Comment, authorName: String) = with(comment) {
-            CommentResponse(id, authorName, text, createdTimeMillis)
+        fun fromComment(comment: Comment, authorName: String, userId: Int) = with(comment) {
+            CommentResponse(
+                id, authorName, text, createdTimeMillis,
+                isAuthored = userId == authorId
+            )
         }
     }
 }

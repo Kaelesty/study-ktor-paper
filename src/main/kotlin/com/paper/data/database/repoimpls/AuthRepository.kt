@@ -1,11 +1,10 @@
-package com.paper.data.database
+package com.paper.data.database.repoimpls
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.paper.data.database.schemas.UserService
 import com.paper.domain.entities.User
 import com.paper.domain.repos.IAuthRepository
-import com.paper.presentation.features.auth.dtos.LoginRequest
-import com.paper.presentation.features.auth.dtos.RegisterRequest
 import java.util.*
 import javax.inject.Inject
 

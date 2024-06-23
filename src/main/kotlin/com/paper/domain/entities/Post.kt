@@ -10,5 +10,6 @@ data class Post(
     val desc: String,
     val text: String,
     val createdTimeMillis: Long,
-    val likesCount: Int
+    val likesCount: Int,
+    val isLiked: Boolean = false
 )

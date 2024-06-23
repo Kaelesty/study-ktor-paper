@@ -4,6 +4,7 @@ import com.paper.domain.repos.IAuthRepository
 import com.paper.domain.repos.ICommentsRepository
 import com.paper.presentation.features.comments.dtos.*
 import com.paper.presentation.runAuthorized
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
@@ -15,20 +16,25 @@ fun Application.configureComments(
     authRepository: IAuthRepository,
 ) {
     routing {
-        authenticate("jwt-auth") {
+        authenticate("auth-jwt") {
             post("$path/leaveComment") {
                 call.runAuthorized<LeaveCommentRequest> { userId, req ->
                     repository.leaveComment(req.postId, userId, req.text)
+                    call.respond(HttpStatusCode.Accepted)
                 }
             }
 
             get("$path/getPostComments") {
-                call.runAuthorized<GetPostCommentsRequest> { _, req ->
+                call.runAuthorized<GetPostCommentsRequest> { userId, req ->
                     val comments = repository.getPostComments(req.postId)
-                    call.respond(
+                    call.respond(HttpStatusCode.OK,
                         GetPostCommentsResponse(
                             comments = comments.map {
-                                CommentResponse.fromComment(it, authRepository.getNameById(it.authorId) ?: "...")
+                                CommentResponse.fromComment(
+                                    it,
+                                    authRepository.getNameById(it.authorId) ?: "...",
+                                    userId
+                                )
                             }
                         )
                     )
@@ -36,6 +42,7 @@ fun Application.configureComments(
             }
             delete("$path/deleteComment") {
                 call.runAuthorized<DeleteCommentRequest> { _, req ->
+                    call.respond(HttpStatusCode.Accepted)
                     repository.deleteComment(req.commentId)
                 }
             }
